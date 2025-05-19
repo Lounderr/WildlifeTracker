@@ -154,7 +154,15 @@ namespace WildlifeTracker
             // Configure the HTTP request pipeline.  
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
+                app.UseSwagger(options =>
+                {
+                    options.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+                    {
+                        swaggerDoc.Info.Description = "Wildlife Tracker API provides endpoints to manage and track wildlife data.";
+                        swaggerDoc.Info.Title = "Wildlife Tracker API";
+                        swaggerDoc.Info.Version = "v1";
+                    });
+                });
                 app.UseSwaggerUI(options =>
                 {
                     options.ConfigObject.AdditionalItems.Add("persistAuthorization", "true");
@@ -204,6 +212,8 @@ namespace WildlifeTracker
                         Array.Empty<string>()
                     }
                 });
+
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "WildlifeTracker.xml"));
             });
         }
     }

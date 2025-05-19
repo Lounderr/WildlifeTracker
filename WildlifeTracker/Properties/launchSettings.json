@@ -5,8 +5,7 @@
       "launchBrowser": true,
       "launchUrl": "https://localhost:5001/swagger/index.html",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        //"ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5000;https://localhost:5001"
@@ -21,7 +20,23 @@
       },
       "publishAllPorts": true,
       "useSSL": true
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "https://localhost:5001/swagger/index.html",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   },
-  "$schema": "https://json.schemastore.org/launchsettings.json"
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:49994/",
+      "sslPort": 44312
+    }
+  }
 }

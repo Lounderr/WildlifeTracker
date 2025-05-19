@@ -16,7 +16,7 @@ namespace WildlifeTracker.Controllers
         private IGenericService<TEntity> genericService => this.HttpContext.RequestServices.GetRequiredService<IGenericService<TEntity>>();
 
         [HttpGet]
-        public virtual async Task<IActionResult> GetAll(
+        public virtual async Task<ActionResult<IEnumerable<object?>>> GetAll(
             [FromQuery] int page,
             [FromQuery] int size,
             [FromQuery] string? filters,
@@ -36,28 +36,28 @@ namespace WildlifeTracker.Controllers
 
         [HttpGet("{id}")]
         [Authorize()]
-        public virtual async Task<IActionResult> GetById([FromRoute] int id)
+        public virtual async Task<ActionResult<TReadDto>> GetById([FromRoute] int id)
         {
             var item = await this.genericService.GetByIdAsync<TReadDto>(id);
             return this.Ok(item);
         }
 
         [HttpPost]
-        public virtual async Task<IActionResult> Create([FromBody] TCreateDto item)
+        public virtual async Task<ActionResult<TReadDto>> Create([FromBody] TCreateDto item)
         {
             var createdItem = await this.genericService.AddAsync<TReadDto, TCreateDto>(item);
             return this.CreatedAtAction(nameof(GetById), new { createdItem.Id }, createdItem);
         }
 
         [HttpPut("{id}")]
-        public virtual async Task<IActionResult> Update([FromRoute] int id, [FromBody] TUpdateDto item)
+        public virtual async Task<ActionResult> Update([FromRoute] int id, [FromBody] TUpdateDto item)
         {
             await this.genericService.UpdateAsync(id, item);
             return this.NoContent();
         }
 
         [HttpDelete("{id}")]
-        public virtual async Task<IActionResult> Delete([FromRoute] int id)
+        public virtual async Task<ActionResult> Delete([FromRoute] int id)
         {
             await this.genericService.DeleteAsync(id);
             return this.NoContent();

@@ -20,14 +20,22 @@ namespace WildlifeTracker.Controllers
     [AllowAnonymous]
     [Route("api/v{version:apiVersion}/[controller]")]
     public class IdentityController(UserManager<User> userManager,
-                              SignInManager<User> signInManager,
-                              IOptionsMonitor<BearerTokenOptions> bearerTokenOptions,
-                              TimeProvider timeProvider) : ControllerBase
+                             SignInManager<User> signInManager,
+                             IOptionsMonitor<BearerTokenOptions> bearerTokenOptions,
+                             TimeProvider timeProvider) : ControllerBase
     {
         private static readonly EmailAddressAttribute _emailAddressAttribute = new();
 
+        /// <summary>  
+        /// Registers a new user in the system.  
+        /// </summary>  
+        /// <param name="registration">The registration details of the user.</param>  
+        /// <returns>Returns an HTTP 200 status if the registration is successful.</returns>  
+        /// <response code="200">User registered successfully.</response>  
+        /// <response code="400">Invalid input data.</response>  
+        /// <response code="500">Internal server error.</response>  
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto registration)
+        public async Task<ActionResult> Register([FromBody] RegisterDto registration)
         {
             if (!userManager.SupportsUserEmail)
             {
@@ -68,8 +76,16 @@ namespace WildlifeTracker.Controllers
             return this.Ok();
         }
 
+        /// <summary>  
+        /// Logs in a user using their email and password.  
+        /// </summary>  
+        /// <param name="login">The login details of the user.</param>  
+        /// <returns>Returns an HTTP 200 status if the login is successful.</returns>  
+        /// <response code="200">User logged in successfully.</response>  
+        /// <response code="401">Invalid credentials.</response>  
+        /// <response code="500">Internal server error.</response>  
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto login)
+        public async Task<ActionResult> Login([FromBody] LoginDto login)
         {
             signInManager.AuthenticationScheme = IdentityConstants.BearerScheme;
 
@@ -83,8 +99,16 @@ namespace WildlifeTracker.Controllers
             return this.Ok();
         }
 
+        /// <summary>  
+        /// Refreshes the authentication token for a user.  
+        /// </summary>  
+        /// <param name="refreshRequest">The refresh token request details.</param>  
+        /// <returns>Returns a new authentication token if the refresh is successful.</returns>  
+        /// <response code="200">Token refreshed successfully.</response>  
+        /// <response code="401">Invalid or expired refresh token.</response>  
+        /// <response code="500">Internal server error.</response>  
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromBody] RefreshRequest refreshRequest)
+        public async Task<ActionResult<Microsoft.AspNetCore.Identity.SignInResult>> Refresh([FromBody] RefreshRequest refreshRequest)
         {
             var refreshTokenProtector = bearerTokenOptions.Get(IdentityConstants.BearerScheme).RefreshTokenProtector;
             var refreshTicket = refreshTokenProtector.Unprotect(refreshRequest.RefreshToken);
