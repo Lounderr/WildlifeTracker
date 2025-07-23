@@ -33,6 +33,16 @@ namespace WildlifeTracker
                 options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
             });
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend",
+                    builder => builder
+                        .WithOrigins("http://localhost:50898")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials());
+            });
+
             builder.Services.AddApiVersioning(options =>
             {
                 options.DefaultApiVersion = new ApiVersion(1, 0);
@@ -55,11 +65,12 @@ namespace WildlifeTracker
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
                 ?? throw new ArgumentNullException(null, "Connection string not found in the configuration file")));
 
+            // Reference Token Strategy
             builder.Services.AddAuthentication(IdentityConstants.BearerScheme)
                 .AddBearerToken(IdentityConstants.BearerScheme, options =>
                 {
-                    options.ClaimsIssuer = builder.Configuration["Jwt:Issuer"]
-                        ?? throw new ArgumentNullException(null, "JWT issuer not found in the configuration file");
+                    options.ClaimsIssuer = builder.Configuration["Token:Issuer"]
+                        ?? throw new ArgumentNullException(null, "Token issuer not found in the configuration file");
                     options.RefreshTokenExpiration = TimeSpan.FromDays(30);
                     options.BearerTokenExpiration = TimeSpan.FromMinutes(30);
                 });
@@ -77,7 +88,7 @@ namespace WildlifeTracker
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddApiEndpoints();
 
-            // Use invalidmodelstateresponsefactory to return custom error messages. Find a way to reuse it in the exception handler
+            // Use invalidmodelstateresponsefactory to return custom error messages. Find a way to reuse it in the exception handler  
 
             builder.Services.AddMvc().ConfigureApiBehaviorOptions(options =>
             {
@@ -155,8 +166,11 @@ namespace WildlifeTracker
 
             app.UseHttpsRedirection();
 
+            app.UseCors("AllowFrontend");
+
             app.UseAuthentication();
             app.UseAuthorization();
+
 
             app.MapControllers();
 
